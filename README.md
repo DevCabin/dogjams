@@ -25,9 +25,17 @@ Product data is scraped from TEMU and stored in `src/data/products.json`.
 
 This project includes an automated scraping system:
 
-1. The scraper script is in `scraper.js`
+1. The scraper script is in `enhanced-scraper.js`
 2. The scraping process is documented in the `dogjams-scraper` skill
 3. The automation can be triggered manually or via cron job
+
+## Chrome Extension
+
+This project includes a Chrome extension that allows you to manually send product information from TEMU directly to your site:
+
+1. The extension is in the `chrome-extension/` directory
+2. You can load it in Chrome manually for testing
+3. It sends product data via the API endpoint at `http://localhost:8000/api/product`
 
 ## Deployment
 
@@ -45,10 +53,24 @@ To get started with the site:
 
 1. To update with new products, run the scraper manually:
    ```bash
-   node scraper.js
+   node enhanced-scraper.js
    ```
 2. Or set up a cron job to run the scraper automatically
 3. The site will rebuild automatically when new products are added
+
+## Using the Chrome Extension
+
+To use the Chrome extension:
+
+1. Run the API server: `npm run api`
+2. Load the extension in Chrome:
+   - Open Chrome and go to `chrome://extensions/`
+   - Enable "Developer mode"
+   - Click "Load unpacked"
+   - Select this directory
+3. The extension will appear in your toolbar
+4. When viewing a TEMU product page, click the extension icon
+5. The product will be sent to your local endpoint
 
 ## Project Structure
 

@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "DogJams Product Sender",
+  "version": "1.0",
+  "description": "Send product information from TEMU to your DogJams site",
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Send to DogJams"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.temu.com/*"],
+      "js": ["content.js"]
+    }
+  ],
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["*"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}
