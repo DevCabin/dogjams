@@ -1,0 +1,92 @@
+[
+  {
+    "id": "temu-123456789",
+    "title": "Funny Dog Costume",
+    "price": 29.99,
+    "description": "This is a funny dog costume for parties",
+    "image_urls": ["https://images.unsplash.com/photo-1517420365037-a57b99b2c2f1?w=300&h=300&fit=crop"],
+    "video_url": "",
+    "product_url": "https://example.com/product1"
+  },
+  {
+    "id": "temu-987654321",
+    "title": "Christmas Dog Costume",
+    "price": 39.99,
+    "description": "A festive costume for your dog's Christmas party",
+    "image_urls": ["https://images.unsplash.com/photo-1517420365037-a57b99b2c2f1?w=300&h=300&fit=crop"],
+    "video_url": "",
+    "product_url": "https://example.com/product2"
+  },
+  {
+    "id": "temu-111111111",
+    "title": "Superhero Dog Costume",
+    "price": 45.99,
+    "description": "Become a superhero with this awesome dog costume",
+    "image_urls": ["https://images.unsplash.com/photo-1517420365037-a57b99b2c2f1?w=300&h=300&fit=crop"],
+    "video_url": "",
+    "product_url": "https://example.com/product3"
+  },
+  {
+    "id": "temu-222222222",
+    "title": "Princess Dog Costume",
+    "price": 34.99,
+    "description": "Make your dog feel like a royal princess",
+    "image_urls": ["https://images.unsplash.com/photo-1517420365037-a57b99b2c2f1?w=300&h=300&fit=crop"],
+    "video_url": "",
+    "product_url": "https://example.com/product4"
+  },
+  {
+    "id": "temu-333333333",
+    "title": "Catsuit Dog Costume",
+    "price": 52.99,
+    "description": "This cat suit will make your dog look like a cat",
+    "image_urls": ["https://images.unsplash.com/photo-1517420365037-a57b99b2c2f1?w=300&h=300&fit=crop"],
+    "video_url": "",
+    "product_url": "https://example.com/product5"
+  },
+  {
+    "id": "temu-444444444",
+    "title": "Dinosaur Dog Costume",
+    "price": 41.99,
+    "description": "Make your dog look like a tiny dinosaur",
+    "image_urls": ["https://images.unsplash.com/photo-1517420365037-a57b99b2c2f1?w=300&h=300&fit=crop"],
+    "video_url": "",
+    "product_url": "https://example.com/product6"
+  },
+  {
+    "id": "temu-555555555",
+    "title": "Space Dog Costume",
+    "price": 37.99,
+    "description": "Explore the universe with your dog",
+    "image_urls": ["https://images.unsplash.com/photo-1517420365037-a57b99b2c2f1?w=300&h=300&fit=crop"],
+    "video_url": "",
+    "product_url": "https://example.com/product7"
+  },
+  {
+    "id": "temu-666666666",
+    "title": "Cowboy Dog Costume",
+    "price": 32.99,
+    "description": "Give your dog a western flair",
+    "image_urls": ["https://images.unsplash.com/photo-1517420365037-a57b99b2c2f1?w=300&h=300&fit=crop"],
+    "video_url": "",
+    "product_url": "https://example.com/product8"
+  },
+  {
+    "id": "temu-777777777",
+    "title": "Pirate Dog Costume",
+    "price": 39.99,
+    "description": "Set sail with your pirate dog",
+    "image_urls": ["https://images.unsplash.com/photo-1517420365037-a57b99b2c2f1?w=300&h=300&fit=crop"],
+    "video_url": "",
+    "product_url": "https://example.com/product9"
+  },
+  {
+    "id": "temu-888888888",
+    "title": "Bee Dog Costume",
+    "price": 28.99,
+    "description": "Make your dog buzz like a bee",
+    "image_urls": ["https://images.unsplash.com/photo-1517420365037-a57b99b2c2f1?w=300&h=300&fit=crop"],
+    "video_url": "",
+    "product_url": "https://example.com/product10"
+  }
+]
