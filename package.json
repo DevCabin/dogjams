@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "api": "node api-server.js"
+    "api": "node api-server.js",
+    "start:api": "node api-server.js"
   },
   "keywords": [],
   "author": "",
@@ -22,6 +23,8 @@
   "dependencies": {
     "@stripe/stripe-js": "^10.4.0",
     "autoprefixer": "^10.7.0",
+    "cors": "^2.8.6",
+    "express": "^5.3.0",
     "playwright": "^1.40.0",
     "react-router-dom": "^7.18.7"
   }

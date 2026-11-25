@@ -1,65 +1,196 @@
-// content.js
-// This script runs in the context of TEMU pages
-// It's designed to detect product information and make it available to the extension
+// content.js — runs on TEMU pages to extract product data
+// Uses multiple strategies: JSON-LD > OpenGraph > CSS selectors
 
-// Wait for the DOM to be ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', init);
-} else {
-  init();
-}
+(function () {
+  'use strict';
 
-function init() {
-  // Check if we're on a product page
-  if (isProductPage()) {
-    // Make product data available to the popup
-    makeProductDataAvailable();
+  const DEBUG = false;
+  function log(...args) {
+    if (DEBUG) console.log('[DogJams]', ...args);
   }
-}
 
-function isProductPage() {
-  // Check if this is a TEMU product page
-  return window.location.hostname.includes('temu.com') && 
-         (window.location.pathname.includes('/product/') || 
-          window.location.pathname.includes('/p/'));
-}
+  function isProductPage() {
+    const host = window.location.hostname;
+    const path = window.location.pathname;
+    return host.includes('temu.com') &&
+      (path.includes('/product/') || path.includes('/p/') || path.includes('/goods/') || path.includes('/item/'));
+  }
 
-function makeProductDataAvailable() {
-  // Create a global variable that the popup can access
-  // Note: In a real extension, you'd use proper messaging
-  const productData = getProductData();
-  
-  // Store for the popup to use
-  window.dogjamsProductData = productData;
-}
+  function getJsonLdProduct() {
+    try {
+      const scripts = document.querySelectorAll('script[type="application/ld+json"]');
+      for (const script of scripts) {
+        const data = JSON.parse(script.textContent);
+        const products = Array.isArray(data) ? data : [data];
+        for (const item of products) {
+          if (item['@type'] === 'Product' || (Array.isArray(item['@type']) && item['@type'].includes('Product'))) {
+            return item;
+          }
+        }
+      }
+    } catch (e) {
+      log('JSON-LD parse error', e);
+    }
+    return null;
+  }
 
-function getProductData() {
-  // Try multiple selectors to find product information
-  const titleElement = document.querySelector('h1') || 
-                      document.querySelector('.product-title') || 
-                      document.querySelector('.title') ||
-                      document.querySelector('h1 span');
-  
-  const priceElement = document.querySelector('.price') || 
-                      document.querySelector('.price-current') || 
-                      document.querySelector('.product-price') ||
-                      document.querySelector('.price-main') ||
-                      document.querySelector('.main-price');
-  
-  const imageElements = document.querySelectorAll('img');
-  const imageElement = imageElements.length > 0 ? imageElements[0] : null;
-  
-  const descriptionElement = document.querySelector('.product-description') || 
-                          document.querySelector('.description') ||
-                          document.querySelector('.product-details') ||
-                          document.querySelector('.description-text');
-  
-  return {
-    title: titleElement ? titleElement.textContent.trim() : 'Unknown Product',
-    price: priceElement ? priceElement.textContent.trim() : '0.00',
-    description: descriptionElement ? descriptionElement.textContent.trim() : '',
-    image_urls: imageElement ? [imageElement.src] : ['https://via.placeholder.com/300'],
-    product_url: window.location.href,
-    video_url: ''
-  };
-}
+  function getMetaContent(selector) {
+    const el = document.querySelector(selector);
+    return el ? el.getAttribute('content')?.trim() : null;
+  }
+
+  function getText(selectors) {
+    for (const sel of selectors) {
+      const el = typeof sel === 'function' ? sel() : document.querySelector(sel);
+      if (el) {
+        const text = el.textContent?.trim();
+        if (text) return text;
+      }
+    }
+    return '';
+  }
+
+  function getImages() {
+    const images = [];
+
+    // JSON-LD images
+    const jsonLd = getJsonLdProduct();
+    if (jsonLd?.image) {
+      if (Array.isArray(jsonLd.image)) {
+        images.push(...jsonLd.image);
+      } else {
+        images.push(jsonLd.image);
+      }
+    }
+
+    // OpenGraph
+    const ogImage = getMetaContent('meta[property="og:image"]');
+    if (ogImage) images.push(ogImage);
+
+    // TEMU-specific image selectors
+    const selectors = [
+      'img[class*="main" i]',
+      'img[class*="product" i]',
+      'img[class*="gallery" i]',
+      '[data-testid*="image"] img',
+      '.product-detail img',
+      'img[src*="cdn"]', // TEMU CDN images
+    ];
+
+    for (const sel of selectors) {
+      const els = document.querySelectorAll(sel);
+      for (const el of els) {
+        const src = el.src || el.dataset.src;
+        if (src && !images.includes(src) && src.startsWith('http')) {
+          images.push(src);
+        }
+      }
+    }
+
+    // Fallback: largest visible image
+    if (images.length === 0) {
+      const allImgs = Array.from(document.querySelectorAll('img'));
+      const visible = allImgs.filter(img => img.naturalWidth > 200 && img.naturalHeight > 200);
+      if (visible.length > 0) {
+        visible.sort((a, b) => (b.naturalWidth * b.naturalHeight) - (a.naturalWidth * a.naturalHeight));
+        images.push(visible[0].src);
+      }
+    }
+
+    return images.filter((url, i, arr) => arr.indexOf(url) === i).slice(0, 10);
+  }
+
+  function parsePrice(input) {
+    if (typeof input === 'number') return input;
+    if (!input) return 0;
+    const text = String(input);
+    // Match patterns like $12.99, 12.99 USD, $1,234.56, etc.
+    const match = text.match(/[\d,]+\.?\d*/);
+    if (match) {
+      return parseFloat(match[0].replace(/,/g, '')) || 0;
+    }
+    return 0;
+  }
+
+  function scrapeProduct() {
+    const jsonLd = getJsonLdProduct();
+    const url = window.location.href;
+
+    // Title
+    let title = '';
+    if (jsonLd?.name) title = jsonLd.name;
+    if (!title) title = getMetaContent('meta[property="og:title"]');
+    if (!title) {
+      title = getText([
+        'h1',
+        '[data-testid*="title"]',
+        '.product-title',
+        '[class*="title" i]',
+      ]);
+    }
+
+    // Price
+    let price = 0;
+    if (jsonLd?.offers?.price) {
+      price = parsePrice(jsonLd.offers.price);
+    }
+    if (!price) {
+      const priceText = getText([
+        '[class*="price" i][class*="current" i]',
+        '[class*="price" i]',
+        '[data-testid*="price"]',
+        '.main-price',
+      ]);
+      price = parsePrice(priceText);
+    }
+
+    // Description
+    let description = '';
+    if (jsonLd?.description) description = jsonLd.description;
+    if (!description) description = getMetaContent('meta[property="og:description"]');
+    if (!description) {
+      description = getText([
+        '[class*="description" i]',
+        '[data-testid*="description"]',
+        '.product-details',
+      ]);
+    }
+
+    // Images
+    const imageUrls = getImages();
+
+    return {
+      title: title || 'Unknown Product',
+      price: price,
+      description: description || title || '',
+      image_urls: imageUrls,
+      product_url: url,
+      video_url: '',
+    };
+  }
+
+  // Listen for messages from popup
+  chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
+    if (request.action === 'scrape') {
+      if (!isProductPage()) {
+        sendResponse({
+          success: false,
+          error: 'Not a TEMU product page. Navigate to a product page and try again.',
+        });
+        return true;
+      }
+      const data = scrapeProduct();
+      sendResponse({ success: true, data });
+    }
+    return true;
+  });
+
+  // Also store for popup direct access fallback
+  if (isProductPage()) {
+    try {
+      window.dogjamsProductData = scrapeProduct();
+    } catch (e) {
+      log('Failed to pre-scrape', e);
+    }
+  }
+})();
