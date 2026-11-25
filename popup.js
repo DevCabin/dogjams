@@ -114,9 +114,12 @@ document.addEventListener('DOMContentLoaded', () => {
       const rawText = await res.text();
       console.log('[DogJams] AI status:', res.status, 'content-type:', contentType, 'body:', rawText);
 
-      const data = contentType.includes('application/json') && rawText
-        ? JSON.parse(rawText)
-        : { error: rawText };
+      let data;
+      try {
+        data = rawText ? JSON.parse(rawText) : {};
+      } catch {
+        data = { error: rawText };
+      }
 
       if (!res.ok) {
         showStatus(data.error || data.detail || 'AI generation failed.', 'error');
