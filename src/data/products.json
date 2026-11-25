@@ -4,7 +4,7 @@
     "title": "Funny Dog Costume",
     "price": 29.99,
     "description": "This is a funny dog costume for parties",
-    "image_urls": ["https://images.unsplash.com/photo-1517420365037-a57b99b2c2f1?w=300&h=300&fit=crop"],
+    "image_urls": ["https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=400&h=400&fit=crop"],
     "video_url": "",
     "product_url": "https://example.com/product1"
   },
@@ -13,7 +13,7 @@
     "title": "Christmas Dog Costume",
     "price": 39.99,
     "description": "A festive costume for your dog's Christmas party",
-    "image_urls": ["https://images.unsplash.com/photo-1517420365037-a57b99b2c2f1?w=300&h=300&fit=crop"],
+    "image_urls": ["https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&h=400&fit=crop"],
     "video_url": "",
     "product_url": "https://example.com/product2"
   },
@@ -22,7 +22,7 @@
     "title": "Superhero Dog Costume",
     "price": 45.99,
     "description": "Become a superhero with this awesome dog costume",
-    "image_urls": ["https://images.unsplash.com/photo-1517420365037-a57b99b2c2f1?w=300&h=300&fit=crop"],
+    "image_urls": ["https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?w=400&h=400&fit=crop"],
     "video_url": "",
     "product_url": "https://example.com/product3"
   },
@@ -31,7 +31,7 @@
     "title": "Princess Dog Costume",
     "price": 34.99,
     "description": "Make your dog feel like a royal princess",
-    "image_urls": ["https://images.unsplash.com/photo-1517420365037-a57b99b2c2f1?w=300&h=300&fit=crop"],
+    "image_urls": ["https://images.unsplash.com/photo-1518717758536-85ae29035b6d?w=400&h=400&fit=crop"],
     "video_url": "",
     "product_url": "https://example.com/product4"
   },
@@ -40,7 +40,7 @@
     "title": "Catsuit Dog Costume",
     "price": 52.99,
     "description": "This cat suit will make your dog look like a cat",
-    "image_urls": ["https://images.unsplash.com/photo-1517420365037-a57b99b2c2f1?w=300&h=300&fit=crop"],
+    "image_urls": ["https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=400&h=400&fit=crop"],
     "video_url": "",
     "product_url": "https://example.com/product5"
   },
@@ -49,7 +49,7 @@
     "title": "Dinosaur Dog Costume",
     "price": 41.99,
     "description": "Make your dog look like a tiny dinosaur",
-    "image_urls": ["https://images.unsplash.com/photo-1517420365037-a57b99b2c2f1?w=300&h=300&fit=crop"],
+    "image_urls": ["https://images.unsplash.com/photo-1544568100-847a948585b9?w=400&h=400&fit=crop"],
     "video_url": "",
     "product_url": "https://example.com/product6"
   },
@@ -58,7 +58,7 @@
     "title": "Space Dog Costume",
     "price": 37.99,
     "description": "Explore the universe with your dog",
-    "image_urls": ["https://images.unsplash.com/photo-1517420365037-a57b99b2c2f1?w=300&h=300&fit=crop"],
+    "image_urls": ["https://images.unsplash.com/photo-1530281700549-e82e7bf110d6?w=400&h=400&fit=crop"],
     "video_url": "",
     "product_url": "https://example.com/product7"
   },
@@ -67,7 +67,7 @@
     "title": "Cowboy Dog Costume",
     "price": 32.99,
     "description": "Give your dog a western flair",
-    "image_urls": ["https://images.unsplash.com/photo-1517420365037-a57b99b2c2f1?w=300&h=300&fit=crop"],
+    "image_urls": ["https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&h=400&fit=crop"],
     "video_url": "",
     "product_url": "https://example.com/product8"
   },
@@ -76,7 +76,7 @@
     "title": "Pirate Dog Costume",
     "price": 39.99,
     "description": "Set sail with your pirate dog",
-    "image_urls": ["https://images.unsplash.com/photo-1517420365037-a57b99b2c2f1?w=300&h=300&fit=crop"],
+    "image_urls": ["https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?w=400&h=400&fit=crop"],
     "video_url": "",
     "product_url": "https://example.com/product9"
   },
@@ -85,7 +85,7 @@
     "title": "Bee Dog Costume",
     "price": 28.99,
     "description": "Make your dog buzz like a bee",
-    "image_urls": ["https://images.unsplash.com/photo-1517420365037-a57b99b2c2f1?w=300&h=300&fit=crop"],
+    "image_urls": ["https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=400&h=400&fit=crop"],
     "video_url": "",
     "product_url": "https://example.com/product10"
   }
