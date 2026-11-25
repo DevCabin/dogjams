@@ -120,6 +120,13 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
+      console.log('[DogJams] AI response:', data);
+
+      if (typeof data.description !== 'string' || !data.description.trim()) {
+        showStatus('AI returned an empty description. Try again.', 'error');
+        return;
+      }
+
       editDescription.value = data.description;
       showStatus('Description updated!', 'success');
     } catch (err) {
