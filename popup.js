@@ -155,7 +155,9 @@ document.addEventListener('DOMContentLoaded', () => {
     statusDiv.textContent = msg;
     statusDiv.className = 'status ' + type;
     statusDiv.style.display = 'block';
-    setTimeout(() => { statusDiv.style.display = 'none'; }, 4000);
+    if (type !== 'error') {
+      setTimeout(() => { statusDiv.style.display = 'none'; }, 4000);
+    }
   }
 
   async function sendToEndpoint(productData) {
