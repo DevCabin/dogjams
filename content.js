@@ -50,8 +50,49 @@
     return '';
   }
 
+  function isValidImageUrl(url) {
+    return url && typeof url === 'string' && url.startsWith('http');
+  }
+
+  function getTemuGalleryImages() {
+    const found = [];
+    try {
+      // The main product image is inside the second <ol> on the page,
+      // specifically the second <li>'s <img>.
+      const allOls = document.querySelectorAll('ol');
+      if (allOls.length >= 2) {
+        const secondOl = allOls[1];
+        const lis = secondOl.querySelectorAll('li');
+        if (lis.length >= 2) {
+          const img = lis[1].querySelector('img');
+          const src = img ? (img.src || img.dataset.src) : null;
+          if (isValidImageUrl(src)) found.push(src);
+        }
+      }
+
+      // Fallback using nth-of-type in case the <ol> is typed among siblings.
+      const ol2 = document.querySelector('ol:nth-of-type(2)');
+      if (ol2) {
+        const li2 = ol2.querySelector('li:nth-of-type(2)');
+        if (li2) {
+          const img = li2.querySelector('img');
+          const src = img ? (img.src || img.dataset.src) : null;
+          if (isValidImageUrl(src) && !found.includes(src)) found.push(src);
+        }
+      }
+    } catch (e) {
+      log('Temu gallery selector error', e);
+    }
+    return found;
+  }
+
   function getImages() {
     const images = [];
+
+    // 1. TEMU gallery image — this is the most reliable source for the
+    //    actual product photo and avoids the solid-red background element.
+    const galleryImages = getTemuGalleryImages();
+    images.push(...galleryImages);
 
     // JSON-LD images
     const jsonLd = getJsonLdProduct();
