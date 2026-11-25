@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { HashRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { CartProvider } from './context/CartContext';
 import CartDrawer from './components/CartDrawer';
 import ProductGrid from './components/ProductGrid';
@@ -11,13 +11,14 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <CartProvider>
-      <HashRouter>
+      <BrowserRouter>
         <CartDrawer />
         <Routes>
           <Route path="/" element={<ProductGrid />} />
-          <Route path="/product/:id" element={<ProductDetail />} />
+          <Route path="/products" element={<ProductGrid />} />
+          <Route path="/products/:slug" element={<ProductDetail />} />
         </Routes>
-      </HashRouter>
+      </BrowserRouter>
     </CartProvider>
   </React.StrictMode>
 );

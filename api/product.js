@@ -57,6 +57,28 @@ function parsePrice(input) {
   return parseFloat(cleaned) || 0;
 }
 
+function slugify(text) {
+  return String(text)
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+}
+
+function uniqueSlug(existingProducts, title) {
+  let base = slugify(title);
+  if (!base) base = `product-${Date.now()}`;
+  let slug = base;
+  let counter = 2;
+  while (existingProducts.some(p => p.slug === slug)) {
+    slug = `${base}-${counter}`;
+    counter++;
+  }
+  return slug;
+}
+
 async function getGitHubFile(token) {
   const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_PATH}?ref=${GITHUB_BRANCH}`;
   const res = await fetch(url, {
@@ -154,7 +176,8 @@ module.exports = async (req, res) => {
     }
 
     const newProduct = {
-      id: body.id || `temu-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+      id: body.id || `dj-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+      slug: uniqueSlug(existingProducts, body.title),
       title: String(body.title).trim().slice(0, 200),
       price: parsePrice(body.price),
       description: String(body.description || body.title || '').trim().slice(0, 1000),

@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import products from '../data/products.json';
+import { getProductSlug } from '../utils/slugify';
 
 const FALLBACK_IMG = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400"%3E%3Crect width="400" height="400" fill="%23f3f4f6"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="18" fill="%239ca3af"%3ENo Image%3C/text%3E%3C/svg%3E';
 
 const ProductDetail = () => {
-  const { id } = useParams();
-  const product = products.find(p => p.id === id);
+  const { slug } = useParams();
+  const product = products.find(p => getProductSlug(p) === slug);
   const { addItem, totalItems, setIsOpen } = useCart();
   const [added, setAdded] = useState(false);
 
