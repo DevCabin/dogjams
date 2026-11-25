@@ -57,6 +57,15 @@ function parsePrice(input) {
   return parseFloat(cleaned) || 0;
 }
 
+function cleanTitleForSlug(title) {
+  return String(title || '')
+    .replace(/[\u2013\u2014]/g, '-')
+    .replace(/\s*[-|]\s*Temu\s*$/i, '')
+    .replace(/\bTemu\b/gi, '')
+    .trim()
+    .replace(/\s+/g, ' ');
+}
+
 function slugify(text) {
   return String(text)
     .normalize('NFD')
@@ -68,7 +77,7 @@ function slugify(text) {
 }
 
 function uniqueSlug(existingProducts, title) {
-  let base = slugify(title);
+  let base = slugify(cleanTitleForSlug(title));
   if (!base) base = `product-${Date.now()}`;
   let slug = base;
   let counter = 2;
