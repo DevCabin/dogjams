@@ -14,10 +14,15 @@ function setEndpoint(url) {
 document.addEventListener('DOMContentLoaded', () => {
   const sendBtn = document.getElementById('sendButton');
   const statusDiv = document.getElementById('status');
-  const previewDiv = document.getElementById('preview');
+  const previewImageDiv = document.getElementById('previewImage');
   const noProductDiv = document.getElementById('noProduct');
   const endpointInput = document.getElementById('endpoint');
   const saveEndpointBtn = document.getElementById('saveEndpoint');
+  const editTitle = document.getElementById('editTitle');
+  const editPrice = document.getElementById('editPrice');
+  const editDescription = document.getElementById('editDescription');
+
+  let currentProduct = null;
 
   // Load saved endpoint
   endpointInput.value = getEndpoint();
@@ -38,55 +43,56 @@ document.addEventListener('DOMContentLoaded', () => {
     const isTemu = tab?.url?.includes('temu.com');
 
     if (isTemu) {
-      sendBtn.style.display = 'inline-block';
       noProductDiv.style.display = 'none';
 
       // Ask content script for data to preview
       chrome.tabs.sendMessage(tab.id, { action: 'scrape' }, (response) => {
         if (chrome.runtime.lastError) {
-          previewDiv.textContent = 'Reload the page if this is a TEMU product page.';
+          previewImageDiv.textContent = 'Reload the page if this is a TEMU product page.';
           console.error('[DogJams] Content script error:', chrome.runtime.lastError);
           return;
         }
         if (response?.success) {
-          renderPreview(response.data);
+          currentProduct = response.data;
+          renderForm(currentProduct);
+          sendBtn.style.display = 'inline-block';
         } else {
-          previewDiv.textContent = response?.error || 'Could not read product data.';
+          previewImageDiv.textContent = response?.error || 'Could not read product data.';
           console.error('[DogJams] Scraping error:', response?.error);
         }
       });
     } else {
       sendBtn.style.display = 'none';
       noProductDiv.style.display = 'block';
-      previewDiv.textContent = '';
+      previewImageDiv.textContent = '';
     }
   });
 
   sendBtn.addEventListener('click', async () => {
-    const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
-    const tab = tabs[0];
+    if (!currentProduct) {
+      showStatus('No product data to send. Open a TEMU product page and try again.', 'error');
+      return;
+    }
 
-    chrome.tabs.sendMessage(tab.id, { action: 'scrape' }, async (response) => {
-      if (chrome.runtime.lastError || !response?.success) {
-        showStatus(response?.error || 'Failed to read product data. Reload the page and try again.', 'error');
-        return;
-      }
+    const editedProduct = {
+      ...currentProduct,
+      title: editTitle.value.trim() || currentProduct.title,
+      price: parseFloat(editPrice.value) || 24.99,
+      description: editDescription.value.trim(),
+    };
 
-      const data = response.data;
-      await sendToEndpoint(data);
-    });
+    await sendToEndpoint(editedProduct);
   });
 
-  function renderPreview(data) {
-    const title = data.title || 'Unknown';
-    const price = typeof data.price === 'number' ? `$${data.price.toFixed(2)}` : data.price;
-    const img = data.image_urls?.[0] ? `<img src="${data.image_urls[0]}" alt="" style="max-width:100%;max-height:120px;border-radius:6px;margin-bottom:8px;">` : '';
+  function renderForm(data) {
+    const img = data.image_urls?.[0]
+      ? `<img src="${escapeHtml(data.image_urls[0])}" alt="" style="max-width:100%;max-height:120px;border-radius:6px;">`
+      : '';
+    previewImageDiv.innerHTML = img;
 
-    previewDiv.innerHTML = `
-      ${img}
-      <div style="font-weight:600;margin-bottom:4px;">${escapeHtml(title)}</div>
-      <div style="color:#2563eb;font-weight:700;">${escapeHtml(price)}</div>
-    `;
+    editTitle.value = data.title || '';
+    editPrice.value = (data.price || 24.99).toFixed(2);
+    editDescription.value = data.description || '';
   }
 
   function showStatus(msg, type) {
