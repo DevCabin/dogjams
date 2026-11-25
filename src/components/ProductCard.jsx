@@ -1,10 +1,19 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useCart } from '../context/CartContext';
 
 const FALLBACK_IMG = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400"%3E%3Crect width="400" height="400" fill="%23f3f4f6"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="18" fill="%239ca3af"%3ENo Image%3C/text%3E%3C/svg%3E';
 
 const ProductCard = ({ product }) => {
   const [imgSrc, setImgSrc] = useState(product.image_urls[0] || FALLBACK_IMG);
+  const { addItem } = useCart();
+  const [added, setAdded] = useState(false);
+
+  const handleAdd = () => {
+    addItem(product);
+    setAdded(true);
+    setTimeout(() => setAdded(false), 1500);
+  };
 
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
@@ -19,15 +28,25 @@ const ProductCard = ({ product }) => {
       <div className="p-4">
         <h3 className="font-bold text-lg mb-2">{product.title}</h3>
         <p className="text-gray-600 mb-2">{product.description}</p>
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center mb-3">
           <span className="text-xl font-bold text-green-600">${product.price.toFixed(2)}</span>
           <Link
             to={`/product/${product.id}`}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition-colors duration-300"
+            className="text-blue-600 hover:underline text-sm"
           >
             View Details
           </Link>
         </div>
+        <button
+          onClick={handleAdd}
+          className={`w-full font-semibold px-4 py-2 rounded-md transition-colors duration-300 ${
+            added
+              ? 'bg-green-600 text-white'
+              : 'bg-blue-600 hover:bg-blue-700 text-white'
+          }`}
+        >
+          {added ? 'Added!' : 'Add to Cart'}
+        </button>
       </div>
     </div>
   );
