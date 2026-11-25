@@ -1,7 +1,7 @@
 // popup.js
 // Uses chrome.tabs.sendMessage to ask the content script for scraped data
 
-const DEFAULT_ENDPOINT = 'https://dogjams.com/api/product';
+const DEFAULT_ENDPOINT = 'http://localhost:8000/api/product';
 
 function getEndpoint() {
   return localStorage.getItem('dogjams_endpoint') || DEFAULT_ENDPOINT;
