@@ -124,7 +124,8 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       if (typeof data.description !== 'string' || !data.description.trim()) {
-        showStatus('AI returned an empty description. Try again.', 'error');
+        console.error('[DogJams] AI response missing description:', data);
+        showStatus(`AI returned an empty description. Raw: ${rawText.slice(0, 200)}`, 'error');
         return;
       }
 
