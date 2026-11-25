@@ -45,12 +45,14 @@ document.addEventListener('DOMContentLoaded', () => {
       chrome.tabs.sendMessage(tab.id, { action: 'scrape' }, (response) => {
         if (chrome.runtime.lastError) {
           previewDiv.textContent = 'Reload the page if this is a TEMU product page.';
+          console.error('[DogJams] Content script error:', chrome.runtime.lastError);
           return;
         }
         if (response?.success) {
           renderPreview(response.data);
         } else {
           previewDiv.textContent = response?.error || 'Could not read product data.';
+          console.error('[DogJams] Scraping error:', response?.error);
         }
       });
     } else {
@@ -99,6 +101,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const originalText = sendBtn.textContent;
     sendBtn.textContent = 'Sending...';
     showStatus('Sending to DogJams...', 'loading');
+    
+    console.log('[DogJams] Attempting to send product data:', productData);
+    console.log('[DogJams] Using endpoint:', getEndpoint());
 
     try {
       const response = await fetch(getEndpoint(), {
@@ -106,8 +111,12 @@ document.addEventListener('DOMContentLoaded', () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(productData),
       });
-
+      
+      console.log('[DogJams] API Response Status:', response.status);
+      console.log('[DogJams] API Response Headers:', response.headers);
+      
       const result = await response.json();
+      console.log('[DogJams] API Response Body:', result);
 
       if (response.status === 409) {
         showStatus('This product is already in your catalog.', 'error');
@@ -117,7 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showStatus(`Error: ${result.error || 'Failed to send product'}`, 'error');
       }
     } catch (err) {
-      console.error(err);
+      console.error('[DogJams] Network error:', err);
       showStatus('Network error. Is the API server running?', 'error');
     } finally {
       sendBtn.disabled = false;
