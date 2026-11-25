@@ -115,7 +115,17 @@ document.addEventListener('DOMContentLoaded', () => {
        console.log('[DogJams] API Response Status:', response.status);
        console.log('[DogJams] API Response Headers:', response.headers);
       
-       const result = await response.json();
+       const contentType = response.headers.get('content-type') || '';
+       let result = {};
+       try {
+         if (contentType.includes('application/json')) {
+           result = await response.json();
+         } else {
+           result = { error: await response.text() };
+         }
+       } catch (parseErr) {
+         result = { error: `Non-JSON response (status ${response.status})` };
+       }
        console.log('[DogJams] API Response Body:', result);
 
        if (response.status === 409) {
