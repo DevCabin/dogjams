@@ -13,7 +13,7 @@
     const host = window.location.hostname;
     const path = window.location.pathname;
     return host.includes('temu.com') &&
-      (path.includes('/product/') || path.includes('/p/') || path.includes('/goods/') || path.includes('/item/'));
+      (path.includes('/product/') || path.includes('/p/') || path.includes('/goods/') || path.includes('/item/') || path.includes('.html'));
   }
 
   function getJsonLdProduct() {
