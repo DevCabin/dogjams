@@ -97,42 +97,44 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   async function sendToEndpoint(productData) {
-    sendBtn.disabled = true;
-    const originalText = sendBtn.textContent;
-    sendBtn.textContent = 'Sending...';
-    showStatus('Sending to DogJams...', 'loading');
-    
-    console.log('[DogJams] Attempting to send product data:', productData);
-    console.log('[DogJams] Using endpoint:', getEndpoint());
+     sendBtn.disabled = true;
+     const originalText = sendBtn.textContent;
+     sendBtn.textContent = 'Sending...';
+     showStatus('Sending to DogJams...', 'loading');
 
-    try {
-      const response = await fetch(getEndpoint(), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(productData),
-      });
-      
-      console.log('[DogJams] API Response Status:', response.status);
-      console.log('[DogJams] API Response Headers:', response.headers);
-      
-      const result = await response.json();
-      console.log('[DogJams] API Response Body:', result);
+     console.log('[DogJams] Attempting to send product data:', productData);
+     console.log('[DogJams] Using endpoint:', getEndpoint());
 
-      if (response.status === 409) {
-        showStatus('This product is already in your catalog.', 'error');
-      } else if (response.ok) {
-        showStatus('Product added to DogJams!', 'success');
-      } else {
-        showStatus(`Error: ${result.error || 'Failed to send product'}`, 'error');
-      }
-    } catch (err) {
-      console.error('[DogJams] Network error:', err);
-      showStatus('Network error. Is the API server running?', 'error');
-    } finally {
-      sendBtn.disabled = false;
-      sendBtn.textContent = originalText;
-    }
-  }
+     try {
+       const response = await fetch(getEndpoint(), {
+         method: 'POST',
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify(productData),
+       });
+      
+       console.log('[DogJams] API Response Status:', response.status);
+       console.log('[DogJams] API Response Headers:', response.headers);
+      
+       const result = await response.json();
+       console.log('[DogJams] API Response Body:', result);
+
+       if (response.status === 409) {
+         showStatus('This product is already in your catalog.', 'error');
+       } else if (response.ok) {
+         showStatus('Product added to DogJams!', 'success');
+       } else {
+         showStatus(`Error: ${result.error || 'Failed to send product'}`, 'error');
+       }
+     } catch (err) {
+       console.error('[DogJams] Network error:', err);
+       showStatus('Network error. Is the API server running? Check the console for details.', 'error');
+       // Also show a more specific error to the user
+       console.error('[DogJams] Failed to send to endpoint:', getEndpoint(), err);
+     } finally {
+       sendBtn.disabled = false;
+       sendBtn.textContent = originalText;
+     }
+   }
 });
 
 function escapeHtml(str) {
