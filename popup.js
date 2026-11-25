@@ -111,16 +111,17 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       const contentType = res.headers.get('content-type') || '';
-      const data = contentType.includes('application/json')
-        ? await res.json()
-        : { error: await res.text() };
+      const rawText = await res.text();
+      console.log('[DogJams] AI status:', res.status, 'content-type:', contentType, 'body:', rawText);
+
+      const data = contentType.includes('application/json') && rawText
+        ? JSON.parse(rawText)
+        : { error: rawText };
 
       if (!res.ok) {
         showStatus(data.error || data.detail || 'AI generation failed.', 'error');
         return;
       }
-
-      console.log('[DogJams] AI response:', data);
 
       if (typeof data.description !== 'string' || !data.description.trim()) {
         showStatus('AI returned an empty description. Try again.', 'error');
