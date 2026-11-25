@@ -24,7 +24,7 @@
     "storage"
   ],
   "host_permissions": [
-    "http://localhost:8000/*",
-    "https://*/api/product"
+    "https://dogjams.com/*",
+    "https://*.dogjams.com/*"
   ]
 }
