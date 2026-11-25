@@ -21,8 +21,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const editTitle = document.getElementById('editTitle');
   const editPrice = document.getElementById('editPrice');
   const editDescription = document.getElementById('editDescription');
+  const aiWriteBtn = document.getElementById('aiWriteBtn');
 
   let currentProduct = null;
+
+  function getAiEndpoint() {
+    return getEndpoint().replace(/\/api\/product\/?$/, '/api/ai-description');
+  }
 
   // Load saved endpoint
   endpointInput.value = getEndpoint();
@@ -63,6 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     } else {
       sendBtn.style.display = 'none';
+      aiWriteBtn.style.display = 'none';
       noProductDiv.style.display = 'block';
       previewImageDiv.textContent = '';
     }
@@ -84,6 +90,46 @@ document.addEventListener('DOMContentLoaded', () => {
     await sendToEndpoint(editedProduct);
   });
 
+  aiWriteBtn.addEventListener('click', async () => {
+    const title = editTitle.value.trim();
+    const description = editDescription.value.trim();
+
+    if (!title) {
+      showStatus('Enter a title before using Write with AI.', 'error');
+      return;
+    }
+
+    aiWriteBtn.disabled = true;
+    aiWriteBtn.textContent = 'Writing...';
+    showStatus('');
+
+    try {
+      const res = await fetch(getAiEndpoint(), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, description }),
+      });
+
+      const contentType = res.headers.get('content-type') || '';
+      const data = contentType.includes('application/json')
+        ? await res.json()
+        : { error: await res.text() };
+
+      if (!res.ok) {
+        showStatus(data.error || data.detail || 'AI generation failed.', 'error');
+        return;
+      }
+
+      editDescription.value = data.description;
+      showStatus('Description updated!', 'success');
+    } catch (err) {
+      showStatus('AI request failed: ' + err.message, 'error');
+    } finally {
+      aiWriteBtn.disabled = false;
+      aiWriteBtn.textContent = '✨ Write with AI';
+    }
+  });
+
   function renderForm(data) {
     const img = data.image_urls?.[0]
       ? `<img src="${escapeHtml(data.image_urls[0])}" alt="" style="max-width:100%;max-height:120px;border-radius:6px;">`
@@ -93,6 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
     editTitle.value = data.title || '';
     editPrice.value = (data.price || 24.99).toFixed(2);
     editDescription.value = data.description || '';
+    aiWriteBtn.style.display = 'inline-block';
   }
 
   function showStatus(msg, type) {
