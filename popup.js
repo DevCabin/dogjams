@@ -1,6 +1,9 @@
 // popup.js
 // Uses chrome.tabs.sendMessage to ask the content script for scraped data
 
+// --------------------------
+//   Helper to get the DogJams API endpoint
+// --------------------------
 const DEFAULT_ENDPOINT = 'https://dogjams.com/api/product';
 
 function getEndpoint() {
@@ -11,6 +14,85 @@ function setEndpoint(url) {
   localStorage.setItem('dogjams_endpoint', url);
 }
 
+// --------------------------
+//   OpenAI key handling
+// --------------------------
+async function getOpenAIKey() {
+  // Prefer Chrome sync storage (requires permission in manifest)
+  if (chrome && chrome.storage && chrome.storage.sync) {
+    return new Promise((resolve, reject) => {
+      chrome.storage.sync.get(['openai_key'], (result) => {
+        if (chrome.runtime.lastError) { reject(chrome.runtime.lastError); return; }
+        const key = result.openai_key;
+        if (key) { resolve(key); return; }
+        // No key stored, prompt user
+        const userKey = prompt('Enter your OpenAI API key:');
+        if (!userKey) { reject(new Error('No key provided')); return; }
+        chrome.storage.sync.set({ openai_key: userKey }, () => {
+          if (chrome.runtime.lastError) { reject(chrome.runtime.lastError); return; }
+          localStorage.setItem('openai_key', userKey); // fallback
+          resolve(userKey);
+        });
+      });
+    });
+  }
+
+  // Fallback to localStorage
+  const key = localStorage.getItem('openai_key');
+  if (key) return Promise.resolve(key);
+
+  // Prompt user
+  const userKey = prompt('Enter your OpenAI API key:');
+  if (!userKey) return Promise.reject(new Error('No key provided'));
+  localStorage.setItem('openai_key', userKey);
+  return Promise.resolve(userKey);
+}
+
+// --------------------------
+//   OpenAI generation
+// --------------------------
+async function generateAiDescriptionOpenAI(title, description) {
+  const apiKey = await getOpenAIKey();
+  const payload = {
+    model: 'gpt-4o-mini',
+    messages: [
+      {
+        role: 'system',
+        content: 'You are a witty, persuasive e-commerce copywriter who writes fun, engaging sales copy for pet products sold on DogJams. Keep it to 1-2 short paragraphs. Be playful but clear.',
+      },
+      {
+        role: 'user',
+        content: `Write fun, compelling sales copy for a product titled "${title}". Current description: ${description || '(none provided)'}.`,
+      },
+    ],
+    temperature: 0.8,
+    max_tokens: 300,
+  };
+  const res = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify(payload),
+  });
+  const rawText = await res.text();
+  const contentType = res.headers.get('content-type') || '';
+  console.log('[DogJams] OpenAI raw status:', res.status, 'content-type:', contentType, 'body:', rawText.slice(0, 200));
+  let data;
+  try { data = JSON.parse(rawText); } catch { data = { error: rawText }; }
+  if (!res.ok) {
+    throw new Error(data.error || data.detail || `OpenAI returned status ${res.status}`);
+  }
+  if (!data.choices || !data.choices[0] || typeof data.choices[0].message.content !== 'string') {
+    throw new Error(`OpenAI returned an empty description. Raw: ${rawText.slice(0, 200)}`);
+  }
+  return data.choices[0].message.content.trim();
+}
+
+// --------------------------
+//   UI logic
+// --------------------------
 document.addEventListener('DOMContentLoaded', () => {
   const sendBtn = document.getElementById('sendButton');
   const statusDiv = document.getElementById('status');
@@ -25,19 +107,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let currentProduct = null;
 
-  function getAiEndpoint() {
-    return getEndpoint().replace(/\/api\/product\/?$/, '/api/ai-description');
-  }
-
   // Load saved endpoint
   endpointInput.value = getEndpoint();
 
   saveEndpointBtn.addEventListener('click', () => {
     const url = endpointInput.value.trim();
-    if (!url) {
-      showStatus('Please enter a valid endpoint URL', 'error');
-      return;
-    }
+    if (!url) { showStatus('Please enter a valid endpoint URL', 'error'); return; }
     setEndpoint(url);
     showStatus('Endpoint saved!', 'success');
   });
@@ -75,10 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   sendBtn.addEventListener('click', async () => {
-    if (!currentProduct) {
-      showStatus('No product data to send. Open a TEMU product page and try again.', 'error');
-      return;
-    }
+    if (!currentProduct) { showStatus('No product data to send. Open a TEMU product page and try again.', 'error'); return; }
 
     const editedProduct = {
       ...currentProduct,
@@ -94,45 +166,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const title = editTitle.value.trim();
     const description = editDescription.value.trim();
 
-    if (!title) {
-      showStatus('Enter a title before using Write with AI.', 'error');
-      return;
-    }
+    if (!title) { showStatus('Enter a title before using Write with AI.', 'error'); return; }
 
     aiWriteBtn.disabled = true;
     aiWriteBtn.textContent = 'Writing...';
     showStatus('');
 
     try {
-      const res = await fetch(getAiEndpoint(), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, description }),
-      });
-
-      const contentType = res.headers.get('content-type') || '';
-      const rawText = await res.text();
-      console.log('[DogJams] AI status:', res.status, 'content-type:', contentType, 'body:', rawText);
-
-      let data;
-      try {
-        data = rawText ? JSON.parse(rawText) : {};
-      } catch {
-        data = { error: rawText };
-      }
-
-      if (!res.ok) {
-        showStatus(data.error || data.detail || 'AI generation failed.', 'error');
-        return;
-      }
-
-      if (typeof data.description !== 'string' || !data.description.trim()) {
-        console.error('[DogJams] AI response missing description:', data);
-        showStatus(`AI returned an empty description. Raw: ${rawText.slice(0, 200)}`, 'error');
-        return;
-      }
-
-      editDescription.value = data.description;
+      const newDesc = await generateAiDescriptionOpenAI(title, description);
+      editDescription.value = newDesc;
       showStatus('Description updated!', 'success');
     } catch (err) {
       showStatus('AI request failed: ' + err.message, 'error');
@@ -144,7 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function renderForm(data) {
     const img = data.image_urls?.[0]
-      ? `<img src="${escapeHtml(data.image_urls[0])}" alt="" style="max-width:100%;max-height:120px;border-radius:6px;">`
+      ? `<img src=\"${escapeHtml(data.image_urls[0])}\" alt=\"\" style=\"max-width:100%;max-height:120px;border-radius:6px;\">`
       : '';
     previewImageDiv.innerHTML = img;
 
@@ -178,10 +220,10 @@ document.addEventListener('DOMContentLoaded', () => {
          headers: { 'Content-Type': 'application/json' },
          body: JSON.stringify(productData),
        });
-      
+ 
        console.log('[DogJams] API Response Status:', response.status);
        console.log('[DogJams] API Response Headers:', response.headers);
-      
+ 
        const contentType = response.headers.get('content-type') || '';
        let result = {};
        try {
@@ -194,7 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
          result = { error: `Non-JSON response (status ${response.status})` };
        }
        console.log('[DogJams] API Response Body:', result);
-
+ 
        if (response.status === 409) {
          showStatus('This product is already in your catalog.', 'error');
        } else if (response.ok) {
@@ -205,7 +247,6 @@ document.addEventListener('DOMContentLoaded', () => {
      } catch (err) {
        console.error('[DogJams] Network error:', err);
        showStatus('Network error. Is the API server running? Check the console for details.', 'error');
-       // Also show a more specific error to the user
        console.error('[DogJams] Failed to send to endpoint:', getEndpoint(), err);
      } finally {
        sendBtn.disabled = false;
