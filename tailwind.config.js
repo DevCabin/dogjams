@@ -12,7 +12,7 @@ export default {
         accent: '#d4a574',
       },
       fontFamily: {
-        sans: ['Poppins', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        sans: ['Fredoka', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
     },
   },
