@@ -10,7 +10,13 @@ body {
   font-family: 'Poppins', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #fffaf5; /* Very soft amber/warm white */
+  background-color: #f0f4f8; /* Muted background color */
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  color: #1a202c; /* Darker text for better readability on muted bg */
 }
 
 .root {
@@ -23,7 +29,7 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: #edf2f7;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -32,5 +38,5 @@ body {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #a0aec0;
 }
