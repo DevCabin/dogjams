@@ -1,82 +1,66 @@
-# DogJams - Pet Costumes Site
+# DogJams
 
-This is a static site for dog costumes, built with Vite and React. The site pulls product data from TEMU and displays it.
+## Overview
+
+DogJams is a Chrome extension that allows users to scrape product data from Temu and send it to your own e-commerce backend. It's designed for easy integration with platforms like Shopify or WooCommerce.
 
 ## Features
 
-- Responsive design with Tailwind CSS
-- Product listings with images and prices
-- Search functionality
-- Auto-updating from TEMU data
+- **Product Scraping**: Extract product details directly from Temu.
+- **Custom API Endpoint**: Send the scraped data to your custom endpoint.
+- **AI-Generated Descriptions**: Use the integrated OpenAI API to generate product descriptions.
+
+## Setup
+
+1. Install the Chrome extension.
+2. Set your custom API endpoint in the extension.
+3. Enter your OpenAI API key in the extension.
 
 ## Development
 
-To develop locally:
+This project was bootstrapped with [Vite](https://vitejs.dev/).
 
-1. Install dependencies: `npm install`
-2. Start the dev server: `npm run dev`
-3. Build for production: `npm run build`
+### Project Structure
 
-## Data Source
+```
+├── public/
+│   └── favicon.svg         # Brand favicon
+├── src/
+│   ├── components/
+│   │   └── ProductCard.jsx # Card component for product display
+│   ├── App.jsx             # Main App component
+│   ├── main.jsx          # Entry point for the React app
+│   └── index.css         # Global styles
+├── tailwind.config.js      # Tailwind CSS configuration
+├── index.html            # Main HTML file
+├── package.json          # Dependencies and scripts
+└── README.md             # This file
+```
 
-Product data is scraped from TEMU and stored in `src/data/products.json`.
+### CSS & Styling
 
-## Automation
+- **Fonts**: Uses Google Font `Poppins`.
+- **Colors**: 
+  - Primary: `#d4a574` (tan)
+  - Muted: `#f0f4f8` (soft background)
+  - Accent: `#d4a574` (tan)
+- **Body Background**: `#f0f4f8` for a soft, muted feel.
 
-This project includes an automated scraping system:
+### Tailwind Configuration
 
-1. The scraper script is in `enhanced-scraper.js`
-2. The scraping process is documented in the `dogjams-scraper` skill
-3. The automation can be triggered manually or via cron job
+The project uses Tailwind CSS. The configuration defines custom color palettes and the `Poppins` font family. It's located at `tailwind.config.js`.
 
-## Chrome Extension
+### Key Files
 
-This project includes a Chrome extension that allows you to manually send product information from TEMU directly to your site:
+- `popup.js`: Manages the UI and API communication.
+- `ProductCard.jsx`: Renders product cards with hover effects.
+- `App.jsx`: Main application layout.
 
-1. The extension is in the `chrome-extension/` directory
-2. You can load it in Chrome manually for testing
-3. It sends product data via the API endpoint at `http://localhost:8000/api/product`
+### Notes
 
-## Deployment
+- The extension requires the `storage` permission in `manifest.json`.
+- The AI description generation uses the OpenAI API.
 
-The site is designed for deployment on Vercel. It's a static site that will build automatically when you push to your repository.
+## License
 
-## Getting Started
-
-To get started with the site:
-
-1. Run `npm install` to install dependencies
-2. Run `npm run dev` to start the development server
-3. The site will be available at http://localhost:5173
-
-## Updating Products
-
-1. To update with new products, run the scraper manually:
-   ```bash
-   node enhanced-scraper.js
-   ```
-2. Or set up a cron job to run the scraper automatically
-3. The site will rebuild automatically when new products are added
-
-## Using the Chrome Extension
-
-To use the Chrome extension:
-
-1. Run the API server: `npm run api`
-2. Load the extension in Chrome:
-   - Open Chrome and go to `chrome://extensions/`
-   - Enable "Developer mode"
-   - Click "Load unpacked"
-   - Select this directory
-3. The extension will appear in your toolbar
-4. When viewing a TEMU product page, click the extension icon
-5. The product will be sent to your local endpoint
-
-## Project Structure
-
-- `src/data/products.json` - Product data (scraped from TEMU)
-- `src/components/ProductCard.jsx` - Single product display component
-- `src/components/ProductGrid.jsx` - Main product grid layout
-- `src/main.jsx` - Entry point
-- `src/index.css` - Base styling with Tailwind
-- `index.html` - HTML entry point
+MIT
