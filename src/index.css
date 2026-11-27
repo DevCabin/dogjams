@@ -2,34 +2,34 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap');
 
 body {
   margin: 0;
   padding: 0;
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Fredoka', sans-serif !important;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #f0f4f8; /* Muted background color */
+  background-color: #f0f4f8;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Fredoka', sans-serif !important;
   font-weight: 600;
-  color: #1a202c; /* Darker text for better readability on muted bg */
+  color: #1a202c;
 }
 
 .root {
   min-height: 100vh;
 }
 
-/* Custom Scrollbar for modern feel */
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #edf2f7;
+  background: #edf2f4;
 }
 
 ::-webkit-scrollbar-thumb {
